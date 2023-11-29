@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/julienschmidt/httprouter"
 )
 
@@ -23,13 +24,13 @@ type ErrorResponse struct {
 func main() {
 	router := httprouter.New()
 
-	router.POST("/calculate", middleware(calculate))
+	router.POST("/calculate", middleware(calculateHandle))
 	port := ":8989"
 	log.Printf("Server started at port %v", port)
 	log.Fatal(http.ListenAndServe(port, router))
 }
 
-func calculate(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func calculateHandle(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var data Data
 
 	decoder := json.NewDecoder(r.Body)
@@ -67,6 +68,7 @@ func middleware(h httprouter.Handle) httprouter.Handle {
 			sendError(w)
 			return
 		}
+		spew.Dump(data)
 		if data.A == nil || *data.A < 0 || data.B == nil || *data.B < 0 {
 			sendError(w)
 			return
