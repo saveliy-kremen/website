@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"bytes"
@@ -10,28 +10,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
-func TestFactorialNumber(t *testing.T) {
-	testCases := []struct {
-		testName string
-		testData uint
-		testRes  uint
-	}{
-		{"factorial_0", 0, 1},
-		{"factorial_10", 10, 3628800},
-		{"factorial_20", 20, 2432902008176640000},
-	}
-
-	for _, testCase := range testCases {
-		t.Run(testCase.testName, func(t *testing.T) {
-			ch := make(chan uint)
-			go factorialNumber(testCase.testData, ch)
-			fact := <-ch
-			if fact != testCase.testRes {
-				t.Errorf("Expected factorial of %d must be %d", testCase.testData, testCase.testRes)
-			}
-		})
-	}
-}
 func TestCalculateHandle(t *testing.T) {
 	testCases := []struct {
 		testName string
@@ -49,7 +27,7 @@ func TestCalculateHandle(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			rr := newRequestRecorder(req, "POST", "/calculate", middleware(calculateHandle))
+			rr := newRequestRecorder(req, "POST", "/calculate", MiddlewareCalculate(CalculateHandler))
 			if testCase.testName == "testOk" {
 				if rr.Code != 200 {
 					t.Error("Expected response code to be 200")
